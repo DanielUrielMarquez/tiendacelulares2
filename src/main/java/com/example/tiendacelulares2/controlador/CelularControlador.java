@@ -1,20 +1,26 @@
 package com.example.tiendacelulares2.controlador;
+
 import com.example.tiendacelulares2.model.Celular;
+import com.example.tiendacelulares2.model.Tienda;
 import com.example.tiendacelulares2.repositorio.CelularRepositorio;
+import com.example.tiendacelulares2.repositorio.TiendaRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RestController
-@RequestMapping("/api/celulares")
+@RequestMapping("/tiendacelulares/celulares")
 public class CelularControlador {
 
     private final CelularRepositorio celularRepositorio;
+    private final TiendaRepositorio tiendaRepositorio;
 
     @Autowired
-    public CelularControlador(CelularRepositorio celularRepositorio) {
+    public CelularControlador(CelularRepositorio celularRepositorio, TiendaRepositorio tiendaRepositorio) {
         this.celularRepositorio = celularRepositorio;
+        this.tiendaRepositorio = tiendaRepositorio;
     }
 
     @GetMapping
@@ -30,8 +36,12 @@ public class CelularControlador {
     }
 
     @PostMapping
-    public Celular crearCelular(@RequestBody Celular celular) {
-        return celularRepositorio.save(celular);
+    public ResponseEntity<Celular> crearCelular(@RequestBody Celular celular) {
+        if (celular.getTienda() != null) {
+            tiendaRepositorio.save(celular.getTienda());
+        }
+        Celular nuevoCelular = celularRepositorio.save(celular);
+        return ResponseEntity.ok(nuevoCelular);
     }
 
     @PutMapping("/{id}")
@@ -41,6 +51,10 @@ public class CelularControlador {
                     celular.setMarca(detallesCelular.getMarca());
                     celular.setModelo(detallesCelular.getModelo());
                     celular.setPrecio(detallesCelular.getPrecio());
+                    if (detallesCelular.getTienda() != null) {
+                        tiendaRepositorio.save(detallesCelular.getTienda());
+                        celular.setTienda(detallesCelular.getTienda());
+                    }
                     Celular celularActualizado = celularRepositorio.save(celular);
                     return ResponseEntity.ok(celularActualizado);
                 })

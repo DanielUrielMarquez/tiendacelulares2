@@ -1,37 +1,34 @@
 package com.example.tiendacelulares2.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
-@Table(name = "celulares") // Nombre de la tabla en la base de datos
+@Table(name = "celulares")
 public class Celular {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
     private Long id;
 
-    @Column(nullable = false)
+    @Column
     private String marca;
 
-    @Column(nullable = false)
+    @Column
     private String modelo;
 
-    @Column(nullable = false)
+    @Column
     private Double precio;
 
-    // Constructor vacío requerido por JPA
-    public Celular() {
-    }
-
     // Getters y Setters
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "tienda_id", referencedColumnName = "id")
+    @JsonManagedReference
+    private Tienda tienda;
+
     public Long getId() {
         return id;
     }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getMarca() {
         return marca;
     }
@@ -55,4 +52,13 @@ public class Celular {
     public void setPrecio(Double precio) {
         this.precio = precio;
     }
+
+    public Tienda getTienda() {
+        return tienda;
+    }
+
+    public void setTienda(Tienda tienda) {
+        this.tienda = tienda;
+    }
+
 }
