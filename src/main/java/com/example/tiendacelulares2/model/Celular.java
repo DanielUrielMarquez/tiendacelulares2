@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Entity
 @Table(name = "celulares")
 public class Celular {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
@@ -20,15 +21,20 @@ public class Celular {
     @Column
     private Double precio;
 
-    // Getters y Setters
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "tienda_id", referencedColumnName = "id")
     @JsonManagedReference
     private Tienda tienda;
 
+    // Getters y Setters
     public Long getId() {
         return id;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getMarca() {
         return marca;
     }
@@ -60,5 +66,4 @@ public class Celular {
     public void setTienda(Tienda tienda) {
         this.tienda = tienda;
     }
-
 }
