@@ -1,9 +1,10 @@
 package com.example.tiendacelulares2.controlador;
 
 import com.example.tiendacelulares2.model.Celular;
-import com.example.tiendacelulares2.model.Tienda;
+import com.example.tiendacelulares2.model.MarcaCelular;
 import com.example.tiendacelulares2.repositorio.CelularRepositorio;
 import com.example.tiendacelulares2.repositorio.TiendaRepositorio;
+import com.example.tiendacelulares2.repositorio.MarcaRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,11 +17,13 @@ public class CelularControlador {
 
     private final CelularRepositorio celularRepositorio;
     private final TiendaRepositorio tiendaRepositorio;
+    private final MarcaRepositorio marcaRepositorio;
 
     @Autowired
-    public CelularControlador(CelularRepositorio celularRepositorio, TiendaRepositorio tiendaRepositorio) {
+    public CelularControlador(CelularRepositorio celularRepositorio, TiendaRepositorio tiendaRepositorio, MarcaRepositorio marcaRepositorio) {
         this.celularRepositorio = celularRepositorio;
         this.tiendaRepositorio = tiendaRepositorio;
+        this.marcaRepositorio = marcaRepositorio;
     }
 
     @GetMapping
@@ -40,6 +43,9 @@ public class CelularControlador {
         if (celular.getTienda() != null) {
             tiendaRepositorio.save(celular.getTienda());
         }
+        if (celular.getMarcas() != null) {
+            celular.getMarcas().forEach(marca -> marca.setCelular(celular));
+        }
         Celular nuevoCelular = celularRepositorio.save(celular);
         return ResponseEntity.ok(nuevoCelular);
     }
@@ -49,17 +55,37 @@ public class CelularControlador {
         return celularRepositorio.findById(id)
                 .map(celular -> {
                     celular.setMarca(detallesCelular.getMarca());
-                    celular.setModelo(detallesCelular.getModelo());
                     celular.setPrecio(detallesCelular.getPrecio());
+
                     if (detallesCelular.getTienda() != null) {
                         tiendaRepositorio.save(detallesCelular.getTienda());
                         celular.setTienda(detallesCelular.getTienda());
                     }
+
+                    if (detallesCelular.getMarcas() != null) {
+                        // Limpiar marcas actuales
+                        for (MarcaCelular marcaCelular : celular.getMarcas()) {
+                            marcaCelular.setCelular(null);
+                            marcaRepositorio.save(marcaCelular);
+                        }
+
+                        // Asociar nuevas marcas
+                        for (MarcaCelular marca : detallesCelular.getMarcas()) {
+                            marca.setCelular(celular);
+                             marcaRepositorio.save(marca);
+                        }
+
+                        // Establecer las nuevas marcas en el celular
+                        celular.setMarcas(detallesCelular.getMarcas());
+                    }
+
                     Celular celularActualizado = celularRepositorio.save(celular);
                     return ResponseEntity.ok(celularActualizado);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> eliminarCelular(@PathVariable Long id) {

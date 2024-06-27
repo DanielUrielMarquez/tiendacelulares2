@@ -2,6 +2,7 @@ package com.example.tiendacelulares2.model;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.util.List;
 
 @Entity
 @Table(name = "celulares")
@@ -16,15 +17,16 @@ public class Celular {
     private String marca;
 
     @Column
-    private String modelo;
-
-    @Column
     private Double precio;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "tienda_id", referencedColumnName = "id")
     @JsonManagedReference
     private Tienda tienda;
+
+    @OneToMany(mappedBy = "celular", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<MarcaCelular> marcas;
 
     // Getters y Setters
     public Long getId() {
@@ -43,14 +45,6 @@ public class Celular {
         this.marca = marca;
     }
 
-    public String getModelo() {
-        return modelo;
-    }
-
-    public void setModelo(String modelo) {
-        this.modelo = modelo;
-    }
-
     public Double getPrecio() {
         return precio;
     }
@@ -65,5 +59,13 @@ public class Celular {
 
     public void setTienda(Tienda tienda) {
         this.tienda = tienda;
+    }
+
+    public List<MarcaCelular> getMarcas() {
+        return marcas;
+    }
+
+    public void setMarcas(List<MarcaCelular> marcas) {
+        this.marcas = marcas;
     }
 }

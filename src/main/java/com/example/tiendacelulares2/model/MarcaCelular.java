@@ -1,11 +1,11 @@
 package com.example.tiendacelulares2.model;
 
-import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 
 @Entity
-@Table(name = "tiendas")
-public class Tienda {
+@Table(name = "marca")
+public class MarcaCelular {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,9 +13,10 @@ public class Tienda {
     private Long id;
 
     @Column
-    private String nombre;
+    private String modelo;
 
-    @OneToOne(mappedBy = "tiendas")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "celular_id")
     @JsonBackReference
     private Celular celular;
 
@@ -24,16 +25,8 @@ public class Tienda {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public String getModelo() {
+        return modelo;
     }
 
     public Celular getCelular() {
