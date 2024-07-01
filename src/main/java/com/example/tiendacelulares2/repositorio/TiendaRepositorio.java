@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TiendaRepositorio extends JpaRepository<Tienda, Long> {
+    Tienda findByNombre(String nombre);
 }

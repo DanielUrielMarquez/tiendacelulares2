@@ -1,32 +1,41 @@
 package com.example.tiendacelulares2.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "marca")
+@Table(name = "marcas")
 public class MarcaCelular {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Long id;
 
     @Column
-    private String modelo;
+    private String nombre;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "celular_id")
-    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "celular_id", referencedColumnName = "id")
+    @JsonIgnore // Evitará la serialización recursiva
     private Celular celular;
 
-    // Getters y Setters
+    public MarcaCelular() {}
+
+    // Getters y setters...
     public Long getId() {
         return id;
     }
 
-    public String getModelo() {
-        return modelo;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public Celular getCelular() {
